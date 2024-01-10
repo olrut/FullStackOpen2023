@@ -3,8 +3,8 @@ import Filter from "./components/Filter.jsx";
 import PersonForm from "./components/PersonForm.jsx";
 import Persons from "./components/Persons.jsx";
 import Notification from "./components/Notification.jsx";
-import getPersons from "./services/getPersons.js";
 import Error from "./components/Error.jsx";
+import getPersons from "./services/getPersons.js";
 
 const App = () => {
     const [persons, setPersons] = useState([])
@@ -12,8 +12,8 @@ const App = () => {
     useEffect(() => {
             getPersons.getAll().then(response => {
                 setPersons(response.data)
-            }, []);
-        }
+            });
+        }, []
     )
     const [nameFilter, setNameFilter] = useState('')
     const [notification, setNotification] = useState(null)

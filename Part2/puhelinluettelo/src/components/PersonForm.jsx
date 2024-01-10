@@ -6,6 +6,25 @@ const PersonForm = ({persons, setPersons, setNotification, setError}) => {
     const [newName, setNewName] = useState('')
     const [newNumber, setNewNumber] = useState('')
 
+    const emptyForm = () => {
+        setNewName('')
+        setNewNumber('')
+    }
+
+    const setErrorMessage = (message) => {
+        setError(message)
+        setTimeout(() => {
+            setError(null)
+        }, 5000)
+    }
+
+    const setNotificationMessage = (message) => {
+        setNotification(message)
+        setTimeout(() => {
+            setNotification(null)
+        }, 5000)
+    }
+
     const handleNumberChange = (event) => {
         setNewNumber(event.target.value)
     }
@@ -27,35 +46,32 @@ const PersonForm = ({persons, setPersons, setNotification, setError}) => {
                     person => person.name.toLowerCase() === newName.toLowerCase()).id
                 getPersons.update(personId, nameObject)
                     .then(response => {
-                        setNotification(`${newName} updated`)
-                        setTimeout(() => {
-                            setNotification(null)
-                        }, 5000)
+                        setNotificationMessage(`${newName} updated`)
                         setPersons(persons.map(
                             person => person.id !== response.data.id ? person : response.data))
                     })
-                    .catch(() => {
-                        setError(`${newName} has already been deleted from server`)
+                    .catch(error => {
+                        setErrorMessage(error.response.data.error)
+                    })
+            }
+        } else {
+            getPersons.create(nameObject)
+                .then(response => {
+                    setPersons(persons.concat(response.data))
+                    setNotification(`${newName} added`)
+                    setTimeout(() => {
+                        setNotification(null)
+                    }, 5000)
+                })
+                .catch(error => {
+                        setError(error.response.data.error)
                         setTimeout(() => {
                             setError(null)
                         }, 5000)
-                        setPersons(persons.filter(person => person.name !== newName))
-                    })
-
-            }
-            return
+                    }
+                )
         }
-
-        getPersons.create(nameObject)
-            .then(response => {
-                setPersons(persons.concat(response.data))
-                setNotification(`${newName} added`)
-                setTimeout(() => {
-                    setNotification(null)
-                }, 5000)
-            })
-
-        setNewName('')
+        emptyForm()
     }
 
     return (
