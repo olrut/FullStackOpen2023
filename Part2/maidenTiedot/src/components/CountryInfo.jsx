@@ -1,8 +1,29 @@
-FullStack
-czho0YGvH3HzIm9s
+import Forecast from "./Forecast.jsx";
 
+const CountryInfo = ({country}) => {
 
-mongodb+srv://FullStack:<password>@cluster0.athyjkq.mongodb.net/?retryWrites=true&w=majority
+    return (
+        <>
+            <div>
+                <h2>{country.name.common}</h2>
+                <p>capital {country.capital} <br/> area {country.area}</p>
+                <h3>languages</h3>
+                <ul>
+                    {Object.values(country.languages).map((language) => (
+                        <li key={language}>{language}</li>
+                    ))}
+                </ul>
+                <img src={country.flags.svg} alt={country.flags.alt} width="200"/>
+            </div>
+            <div>
+                <Forecast
+                    capital={country.capital}
+                    lat={country.latlng[0]}
+                    lon={country.latlng[1]}
+                />
+            </div>
+        </>
+    )
+}
 
-
-fly secrets set MONGODB_URI='mongodb+srv://FullStack:czho0YGvH3HzIm9s@cluster0.athyjkq.mongodb.net/?retryWrites=true&w=majority'
+export default CountryInfo;
