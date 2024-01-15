@@ -120,6 +120,41 @@ describe('blogs post', () => {
     })
 })
 
+describe('deleting blog', () => {
+    test('deleting blog', async () => {
+        const response = await api.get('/api/blogs')
+        const id = response.body[0].id
+
+        await api
+            .delete(`/api/blogs/${id}`)
+            .expect(204)
+
+        const response2 = await api.get('/api/blogs')
+        expect(response2.body.length).toBe(initialBlogs.length - 1)
+    })
+})
+
+describe('editing blog', () => {
+        test('editing blog', async () => {
+            const response = await api.get('/api/blogs')
+            const id = response.body[0].id
+
+            const testBlog = {
+                title: 'Test blog 6',
+                author: 'Test author 6',
+                url: 'Test url 6',
+                likes: 6
+            }
+
+            await api
+                .put(`/api/blogs/${id}`)
+                .send(testBlog)
+                .expect(200)
+                .expect('Content-Type', /application\/json/)
+        })
+    }
+)
+
 
 afterAll(async () => {
     await mongoose.connection.close()
