@@ -24,10 +24,21 @@ blogsRouter.post('/', (request, response, next) => {
 
     const blog = new Blog(body);
 
+    if (!blog.title || !blog.url) {
+        return response.status(400).json({
+            error: 'Bad Request. Missing title or url.'
+        })
+    }
+
+    if (!blog.likes) {
+        blog.likes = 0
+    }
+
+
     blog
         .save()
         .then(savedBlog => {
-            response.json(savedBlog)
+            response.status(201).json(savedBlog)
         })
         .catch(error => next(error))
 })
