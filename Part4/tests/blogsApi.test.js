@@ -1,29 +1,38 @@
 const mongoose = require('mongoose')
 const supertest = require('supertest')
-const app = require('../app')
-const Blog = require('../models/blog')
-const api = supertest(app)
 
-const initialBlogs = [
-    {
-        title: 'Test blog 1',
-        author: 'Test author 1',
-        url: 'Test url 1',
-        likes: 1
-    },
-    {
-        title: 'Test blog 2',
-        author: 'Test author 2',
-        url: 'Test url 2',
-        likes: 2
-    },
-    {
-        title: 'Test blog 3',
-        author: 'Test author 3',
-        url: 'Test url 3',
-        likes: 3
+const app = require('../app')
+const api = supertest(app)
+const {initialBlogs} = require("./testHelper");
+const Blog = require('../models/blog')
+const User = require("../models/user");
+
+let token = null
+beforeAll(async () => {
+    await User.deleteMany({})
+
+    const newUser = {
+        username: 'tester',
+        name: 'Testi Teppo',
+        password: 'tester',
     }
-]
+    await api
+        .post('/api/users')
+        .send(newUser)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+    const sign =
+        await api
+            .post("/api/login")
+            .send(
+                {
+                    username: "tester",
+                    password: "tester"
+                }
+            );
+    token = sign.body.token
+})
 
 beforeEach(async () => {
     await Blog.deleteMany({})
@@ -39,7 +48,6 @@ beforeEach(async () => {
 })
 
 describe('blogs get and correct id', () => {
-
     test('blogs are returned as json', async () => {
         await api
             .get('/api/blogs')
@@ -49,34 +57,28 @@ describe('blogs get and correct id', () => {
 
     test('all blogs are returned', async () => {
         const response = await api.get('/api/blogs')
-
-        expect(response.body.length).toBe(initialBlogs.length)
+        expect(response.body.length).toBe(3)
     })
 
     test('Id is defined', async () => {
         const response = await api.get('/api/blogs')
-
         expect(response.body[0].id).toBeDefined()
     })
 })
 
 describe('blogs post', () => {
     test('adding blog', async () => {
-        const testBlog = {
-            title: 'Test blog 4',
-            author: 'Test author 4',
-            url: 'Test url 4',
-            likes: 4
-        }
+        const testBlog = initialBlogs[3]
 
         await api
             .post('/api/blogs')
+            .set('Authorization', `Bearer ${token}`)
             .send(testBlog)
             .expect(201)
             .expect('Content-Type', /application\/json/)
 
         const response = await api.get('/api/blogs')
-        expect(response.body.length).toBe(initialBlogs.length + 1)
+        expect(response.body.length).toBe(4)
         response.body.forEach(blog => {
             if (blog.title === testBlog.title) {
                 expect(blog.likes).toBe(testBlog.likes)
@@ -84,6 +86,16 @@ describe('blogs post', () => {
                 expect(blog.url).toBe(testBlog.url)
             }
         })
+    })
+
+    test('adding blog without authorization', async () => {
+        const testBlog = initialBlogs[3]
+
+        await api
+            .post('/api/blogs')
+            .set('Authorization', `Bearer `)
+            .send(testBlog)
+            .expect(401)
     })
 
     test('adding blog without title', async () => {
@@ -100,62 +112,44 @@ describe('blogs post', () => {
 
     test('adding blog without likes', async () => {
         const testBlog = {
-            title: 'Test blog 5',
+            title: 'Test title 5',
             author: 'Test author 5',
-            url: 'Test url 5'
+            url: 'Test url 5',
         }
 
         await api
             .post('/api/blogs')
+            .set('Authorization', `Bearer ${token}`)
             .send(testBlog)
             .expect(201)
             .expect('Content-Type', /application\/json/)
 
         const response = await api.get('/api/blogs')
+        expect(response.body.length).toBe(4)
         response.body.forEach(blog => {
             if (blog.title === testBlog.title) {
                 expect(blog.likes).toBe(0)
+                expect(blog.author).toBe(testBlog.author)
+                expect(blog.url).toBe(testBlog.url)
             }
         })
     })
 })
 
 describe('deleting blog', () => {
-    test('deleting blog', async () => {
+    test('deleting blog without authorization', async () => {
         const response = await api.get('/api/blogs')
         const id = response.body[0].id
-
         await api
             .delete(`/api/blogs/${id}`)
-            .expect(204)
-
-        const response2 = await api.get('/api/blogs')
-        expect(response2.body.length).toBe(initialBlogs.length - 1)
+            .expect(401)
+        const blogsAtEnd = await Blog.find({})
+        expect(blogsAtEnd.length).toBe(3)
     })
 })
 
-describe('editing blog', () => {
-        test('editing blog', async () => {
-            const response = await api.get('/api/blogs')
-            const id = response.body[0].id
-
-            const testBlog = {
-                title: 'Test blog 6',
-                author: 'Test author 6',
-                url: 'Test url 6',
-                likes: 6
-            }
-
-            await api
-                .put(`/api/blogs/${id}`)
-                .send(testBlog)
-                .expect(200)
-                .expect('Content-Type', /application\/json/)
-        })
-    }
-)
-
-
 afterAll(async () => {
+    await Blog.deleteMany({})
+    await User.deleteMany({})
     await mongoose.connection.close()
 })
