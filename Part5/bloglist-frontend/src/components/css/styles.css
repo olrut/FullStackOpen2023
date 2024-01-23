@@ -1,0 +1,23 @@
+.notification {
+    color: green;
+    padding: 10px;
+    font-size: 15px;
+    border: 2px solid green;
+    background-color: lightgrey;
+}
+
+.error {
+    color: red;
+    padding: 10px;
+    font-size: 15px;
+    border: 2px solid red;
+    background-color: lightgrey;
+}
+
+.blog {
+    padding-top: 10px;
+    padding-left: 2px;
+    border: solid;
+    border-width: 1px;
+    margin-bottom: 5px;
+}

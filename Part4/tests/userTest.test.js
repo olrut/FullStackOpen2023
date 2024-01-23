@@ -12,7 +12,7 @@ describe('Add users', () => {
     })
 
     test('creation succeeds with a fresh username', async () => {
-        const usersAtStart = await usersInDb()
+        await User.deleteMany({})
 
         const newUser = {
             username: 'testUser',
@@ -27,7 +27,7 @@ describe('Add users', () => {
             .expect('Content-Type', /application\/json/)
 
         const usersAtEnd = await usersInDb()
-        expect(usersAtEnd).toHaveLength(usersAtStart.length + 1)
+        expect(usersAtEnd).toHaveLength(1)
         expect(usersAtEnd.map(u => u.username)).toContain(newUser.username)
     })
 
@@ -57,7 +57,7 @@ describe('Add users', () => {
     })
 
     afterAll(async () => {
-        User.deleteMany({})
+        await User.deleteMany({})
         await mongoose.connection.close()
     })
 })
