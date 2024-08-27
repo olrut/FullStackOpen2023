@@ -3,7 +3,7 @@ import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {createAnecdote} from "../requests.js";
 
 const AnecdoteForm = () => {
-   const dispatch = useNotificationDispatch()
+    const dispatch = useNotificationDispatch()
     const queryClient = useQueryClient()
     const newAnecdoteMutation = useMutation({
         mutationFn: (createAnecdote),
