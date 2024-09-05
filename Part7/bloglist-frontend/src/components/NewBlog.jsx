@@ -1,7 +1,7 @@
 import { useDispatch } from 'react-redux'
 import { addBlog } from '../reducers/blogReducer.js'
 
-const NewBlog = (user) => {
+const NewBlog = () => {
   const dispatch = useDispatch()
   const handleCreateBlog = (event) => {
     event.preventDefault()
@@ -10,9 +10,6 @@ const NewBlog = (user) => {
       author: event.target.author.value,
       url: event.target.url.value,
       likes: 0,
-      user: {
-        username: user.username,
-      },
     }
     dispatch(addBlog(blogObject))
     event.target.title.value = ''
@@ -21,19 +18,47 @@ const NewBlog = (user) => {
   }
 
   return (
-    <div>
-      <form onSubmit={handleCreateBlog}>
-        title:
-        <input type="text" name="title" placeholder="title" id="title" />
-        author:
-        <input type="text" name="author" placeholder="author" id="author" />
-        url:
-        <input type="text" name="url" placeholder="url" id="url" />
-        <button id="create-blog-submit" type="submit">
-          create
+    <form onSubmit={handleCreateBlog}>
+      <div className="mb-3">
+        <label htmlFor="title" className="form-label">
+          Title:
+        </label>
+        <input
+          type="text"
+          className="form-control"
+          name="title"
+          placeholder="Title"
+          id="title"
+        />
+        <label htmlFor="Author" className="form-label">
+          Author:
+        </label>
+        <input
+          type="text"
+          className="form-control"
+          name="author"
+          placeholder="Author"
+          id="author"
+        />
+        <label htmlFor="url" className="form-label">
+          URL:
+        </label>
+        <input
+          type="text"
+          className="form-control"
+          name="url"
+          placeholder="URL"
+          id="url"
+        />
+        <button
+          id="create-blog-submit"
+          type="submit"
+          className="btn btn-primary"
+        >
+          Create
         </button>
-      </form>
-    </div>
+      </div>
+    </form>
   )
 }
 export default NewBlog

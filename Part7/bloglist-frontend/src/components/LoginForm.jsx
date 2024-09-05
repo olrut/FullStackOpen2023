@@ -1,27 +1,29 @@
 const LoginForm = ({ handleSignIn }) => {
   return (
-    <div>
-      <h2>Sign in</h2>
+    <>
       <form onSubmit={handleSignIn}>
-        <div>
-          username
+        <div className="mb-3">
+          <h3>Sign in</h3>
+          <label htmlFor="username">Username</label>
           <input
             id="username"
             type="text"
             name="username"
+            className="form-control"
           />
-        </div>
-        <div>
-          password
+          <label htmlFor="password">Password</label>
           <input
             id="password"
             type="password"
             name="password"
+            className="form-control"
           />
+          <button type="submit" id="login-button" className="btn btn-primary">
+            login
+          </button>
         </div>
-        <button type="submit" id="login-button">login</button>
       </form>
-    </div>
+    </>
   )
 }
 

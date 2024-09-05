@@ -1,48 +1,53 @@
-import { useState } from 'react'
 import DeleteButton from './DeleteButton.jsx'
-import { useDispatch } from 'react-redux'
-import { likeBlog } from '../reducers/blogReducer.js'
+import { useDispatch, useSelector } from 'react-redux'
+import { commentBlog, likeBlog } from '../reducers/blogReducer.js'
+import { Link, useParams } from 'react-router-dom'
 
-const Blog = ({ blog, setError, blogs, setBlogs, loggedUser }) => {
+const Blog = (setError, setBlogs, loggedUser) => {
   const dispatch = useDispatch()
 
-  const [showDetails, setShowDetails] = useState(false)
-  const show = () => {
-    setShowDetails(!showDetails)
+  const blogs = useSelector((state) => state.blogs)
+  const id = useParams().id
+
+  const blog = blogs ? blogs.find((blog) => blog.id === id) : null
+  if (!blog) {
+    return null
   }
 
-  const handleLike = async (id) => {
-    dispatch(likeBlog(id))
+  const handleLike = async () => {
+    dispatch(likeBlog(blog.id))
   }
-  console.log(blog)
-  console.log(loggedUser)
+
+  const handleComment = async (event) => {
+    event.preventDefault()
+    const comment = event.target.comment.value
+    dispatch(commentBlog(blog.id, comment))
+    console.log(comment)
+  }
+
   return (
     <div className={'blog'}>
-      {blog.title} {blog.author}
-      {showDetails && (
-        <div>
-          {blog.url}
-          <br />
-          Likes {blog.likes}
-          <br />
-          <button onClick={() => handleLike(blog.id)}>like</button>
-          <br />
-          {blog.user.name}
-          {loggedUser && blog.user.username === loggedUser.username ? (
-            <DeleteButton
-              blog={blog}
-              blogs={blogs}
-              setBlogs={setBlogs}
-              setError={setError}
-            />
-          ) : null}
-        </div>
-      )}
-      {showDetails ? (
-        <button onClick={show}>hide</button>
-      ) : (
-        <button onClick={show}>view</button>
-      )}
+      <h1>
+        {blog.title} {blog.author}
+      </h1>
+      <Link to={blog.url}>{blog.url}</Link>
+      <br />
+      {blog.likes} likes <button onClick={() => handleLike()}>like</button>
+      <br />
+      Added by {blog.user.name}
+      {loggedUser && blog.user.username === loggedUser.username ? (
+        <DeleteButton blog={blog} />
+      ) : null}
+      <form onSubmit={handleComment}>
+        <h2>comments</h2>
+        <input type="text" id="comment" />
+        <button type="submit">add comment</button>
+      </form>
+      <div>
+        {blog.comments.map((comment, index) => (
+          <p key={index}>{comment}</p>
+        ))}
+      </div>
     </div>
   )
 }

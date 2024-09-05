@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit'
 import blogService from '../services/blogs.js'
 import loginService from '../services/loginService.js'
 import { setNotification } from './notificationReducer.js'
+import { useNavigate } from 'react-router-dom'
 
 const userSlice = createSlice({
   name: 'user',
@@ -12,8 +13,19 @@ const userSlice = createSlice({
     },
   },
 })
-
 export const { setUser } = userSlice.actions
+
+const usersSlice = createSlice({
+  name: 'users',
+  initialState: [],
+  reducers: {
+    setUsers(state, action) {
+      return action.payload
+    },
+  },
+})
+
+export const { setUsers } = usersSlice.actions
 
 export const setupUser = () => (dispatch) => {
   const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
@@ -32,6 +44,8 @@ export const login =
       window.localStorage.setItem('loggedBlogAppUser', JSON.stringify(user))
       blogService.setToken(user.token)
       dispatch(setUser(user))
+      const navigate = useNavigate()
+      navigate('/')
     } catch (exception) {
       setNotification('Wrong username or password')
       setTimeout(() => {}, 5000)

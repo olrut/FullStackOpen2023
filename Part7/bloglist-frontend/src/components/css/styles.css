@@ -17,7 +17,19 @@
 .blog {
     padding-top: 10px;
     padding-left: 2px;
-    border: solid;
-    border-width: 1px;
+    border: 1px solid;
     margin-bottom: 5px;
+}
+
+.navbar {
+    background-color: Cyan;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar ul {
+
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
 }
